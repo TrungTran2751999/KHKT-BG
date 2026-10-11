@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KHTN 8 – Chất và sự biến đổi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.21/vue.global.prod.min.js"></script>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f8f6;--card:#fff;--tx:#17302a;--mu:#5d7770;--pr:#0f8a6c;--prt:#fff;--bd:#d7e4df;--ok:#16a34a;--no:#dc2626;--soft:#e4f3ee}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1815;--card:#16241f;--tx:#e6f1ed;--mu:#97b2aa;--pr:#2cc29b;--prt:#06231b;--bd:#27403a;--soft:#1b332c}}
+:root[data-theme="dark"]{--bg:#0e1815;--card:#16241f;--tx:#e6f1ed;--mu:#97b2aa;--pr:#2cc29b;--prt:#06231b;--bd:#27403a;--soft:#1b332c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--card);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.brand{font-weight:700;font-size:17px;color:var(--pr)}.sp{flex:1}
+main{max-width:1000px;margin:0 auto;padding:20px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:18px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:7px 14px;border-radius:8px}
+button.p{background:var(--pr);color:var(--prt);border-color:var(--pr);font-weight:600}
+button.d{color:var(--no)}button.on{background:var(--soft);border-color:var(--pr);color:var(--pr);font-weight:600}
+input,textarea,select{font:inherit;width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);margin:3px 0 10px}
+textarea{min-height:90px}label{font-size:13px;color:var(--mu);font-weight:600}
+.nav{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.bar{height:8px;background:var(--soft);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--pr)}
+.mu{color:var(--mu);font-size:13px}.stat{font-size:28px;font-weight:700;color:var(--pr)}
+.opt{display:block;width:100%;text-align:left;margin:5px 0}.opt.ok{border-color:var(--ok);background:rgba(22,163,74,.15)}.opt.no{border-color:var(--no);background:rgba(220,38,38,.12)}
+.tbl{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:560px}th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:left}
+.th h4{margin:14px 0 4px;color:var(--pr)}.th p,.th ul{margin:6px 0}
+.tag{display:inline-block;padding:2px 9px;border-radius:99px;background:var(--soft);color:var(--pr);font-size:12px;font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--bd)}.step input{width:auto;margin:5px 0}
+.box{background:var(--soft);border-radius:10px;padding:12px;margin-top:10px}
+.flow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0;padding:12px;background:var(--soft);border-radius:10px}.fb{background:var(--card);border:1px solid var(--pr);border-radius:8px;padding:6px 10px;text-align:center;font-size:13px}.fa{color:var(--pr);font-weight:700;font-size:13px}.ph{height:18px;border-radius:9px;background:linear-gradient(90deg,#e11d48,#f59e0b,#84cc16,#10b981,#3b82f6,#7c3aed)}.pl{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-bottom:8px}.note{border-left:4px solid var(--pr);padding:8px 12px;background:var(--soft);margin:10px 0;border-radius:0 8px 8px 0}
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <span class="brand">⚗️ KHTN 8 · Chất và sự biến đổi</span><span class="sp"></span>
+  <template v-if="role"><span class="tag">{{ role==='teacher'?'Giáo viên':'HS: '+(me&&me.name) }}</span><button @click="logout">Đăng xuất</button></template>
+</header>
+<main>
+
+<!-- ĐĂNG NHẬP -->
+<div v-if="!role" class="grid">
+  <div class="card"><h3>👩‍🏫 Giáo viên</h3><p class="mu">Soạn bài, quản lí học sinh, theo dõi kết quả.</p>
+    <label>Mật khẩu (mặc định: gv123)</label><input type="password" v-model="pw" @keyup.enter="loginT">
+    <button class="p" @click="loginT">Vào trang giáo viên</button><p v-if="err" style="color:var(--no)">{{err}}</p></div>
+  <div class="card"><h3>🧑‍🎓 Học sinh</h3><p class="mu">Học lí thuyết, làm bài tập, xem thí nghiệm.</p>
+    <label>Chọn tên của em</label>
+    <select v-model="pick"><option value="">-- chọn --</option><option v-for="s in db.students" :value="s.id">{{s.name}}</option></select>
+    <button class="p" :disabled="!pick" @click="loginS(pick)">Vào học</button>
+    <hr style="border:0;border-top:1px solid var(--bd);margin:14px 0">
+    <label>Hoặc tạo tên mới</label><input v-model="newName" placeholder="Họ và tên" @keyup.enter="regS">
+    <button @click="regS">Tạo &amp; vào học</button></div>
+</div>
+
+<!-- GIÁO VIÊN -->
+<template v-else-if="role==='teacher'">
+  <div class="nav"><button v-for="t in [['home','Tổng quan'],['lessons','Bài học'],['students','Học sinh']]" :class="{on:tv===t[0]}" @click="tv=t[0];edit=null">{{t[1]}}</button></div>
+
+  <div v-if="tv==='home'">
+    <div class="grid">
+      <div class="card"><div class="mu">Số bài học</div><div class="stat">{{db.lessons.length}}</div></div>
+      <div class="card"><div class="mu">Số học sinh</div><div class="stat">{{db.students.length}}</div></div>
+      <div class="card"><div class="mu">Điểm TB (thang 10)</div><div class="stat">{{avgAll}}</div></div>
+      <div class="card"><div class="mu">Tiến độ TB</div><div class="stat">{{progAll}}%</div></div>
+    </div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(340px,1fr))"><div class="card"><h3>Điểm TB theo bài (thang 10)</h3><bar-chart :items="chartL" :max="10"></bar-chart></div><div class="card"><h3>Tiến độ từng học sinh (%)</h3><div class="tbl"><bar-chart :items="chartS" :max="100"></bar-chart></div></div></div>
+    <div class="card"><h3>Kết quả theo bài</h3>
+      <div v-for="l in db.lessons" style="margin:10px 0"><div class="row"><b>{{l.title}}</b><span class="sp"></span><span class="mu">{{doneCount(l)}}/{{db.students.length}} HS làm bài · TB {{avgLesson(l)}}</span></div>
+      <div class="bar"><i :style="{width:(db.students.length?doneCount(l)/db.students.length*100:0)+'%'}"></i></div></div></div>
+  </div>
+
+  <div v-if="tv==='lessons'&&!edit">
+    <button class="p" @click="newLesson" style="margin-bottom:12px">+ Thêm bài học</button>
+    <div class="card" v-for="l in db.lessons"><div class="row"><div><b>{{l.title}}</b><div class="mu">{{l.questions.length}} câu hỏi · thí nghiệm: {{l.exp.name||'chưa có'}}</div></div><span class="sp"></span>
+      <button @click="l.hidden=!l.hidden;save()">{{l.hidden?'👁 Hiện bài (đang ẩn)':'🙈 Ẩn bài'}}</button><button @click="edit=clone(l)">Sửa</button><button class="d" @click="delLesson(l)">Xoá</button></div></div>
+  </div>
+
+  <div v-if="tv==='lessons'&&edit" class="card">
+    <h3>{{isNew?'Bài học mới':'Sửa bài học'}}</h3>
+    <label>Tiêu đề</label><input v-model="edit.title">
+    <label>Lí thuyết (cho phép HTML: &lt;h4&gt;, &lt;p&gt;, &lt;ul&gt;)</label><textarea v-model="edit.theory" style="min-height:160px"></textarea>
+    <h4>Bài tập trắc nghiệm</h4>
+    <div class="box" v-for="(q,i) in edit.questions"><label>Câu {{i+1}}</label><input v-model="q.q">
+      <div class="row" v-for="(o,j) in q.opts" :key="j"><input type="radio" :value="j" v-model="q.a" style="width:auto"><input v-model="q.opts[j]" :placeholder="'Đáp án '+'ABCD'[j]" style="flex:1"></div>
+      <span class="mu">Chọn nút tròn ở đáp án đúng.</span> <button class="d" @click="edit.questions.splice(i,1)">Xoá câu</button></div>
+    <button @click="edit.questions.push({q:'',opts:['','','',''],a:0})" style="margin:8px 0">+ Thêm câu hỏi</button>
+    <h4>Thí nghiệm</h4>
+    <label>Tên thí nghiệm</label><input v-model="edit.exp.name">
+    <label>Dụng cụ, hoá chất</label><input v-model="edit.exp.mats">
+    <label>Các bước (mỗi dòng một bước)</label><textarea v-model="edit.exp.steps"></textarea>
+    <label>Hiện tượng &amp; giải thích</label><textarea v-model="edit.exp.result"></textarea>
+    <div class="row"><button class="p" @click="saveLesson">Lưu</button><button @click="edit=null">Huỷ</button></div>
+  </div>
+
+  <div v-if="tv==='students'">
+    <div class="card row"><input v-model="newName" placeholder="Thêm học sinh mới" style="flex:1;margin:0" @keyup.enter="addS"><button class="p" @click="addS">Thêm</button></div>
+    <div class="card" v-if="detail"><div class="row"><h3 style="margin:0">Chi tiết: {{detail.name}}</h3><span class="sp"></span><button @click="detail=null">Đóng</button></div><div class="tbl"><table><thead><tr><th>Bài</th><th>Lí thuyết</th><th>Bài tập</th><th>Thí nghiệm</th><th>Hoàn thành</th></tr></thead><tbody><tr v-for="l in db.lessons" :key="l.id"><td>{{l.title}}</td><td>{{(detail.p[l.id]||{}).read?'✅':'⬜'}}</td><td>{{scoreTxt(detail,l)}}</td><td>{{(detail.p[l.id]||{}).exp?'✅':'⬜'}}</td><td>{{lp(detail,l)}}%</td></tr></tbody></table></div><div class="mu" style="margin-top:8px">Điểm bài tập từng bài (thang 10)</div><bar-chart :items="dchart" :max="10"></bar-chart></div>
+    <div class="card tbl"><table><thead><tr><th>Học sinh</th><th v-for="(l,i) in db.lessons" :title="l.title">Bài {{i+1}}</th><th>Tiến độ</th><th></th></tr></thead>
+      <tbody><tr v-for="s in db.students"><td><a href="#" @click.prevent="detail=s" style="color:var(--pr);font-weight:600">{{s.name}}</a></td>
+        <td v-for="l in db.lessons">{{scoreTxt(s,l)}}</td><td>{{prog(s)}}%</td><td><button class="d" @click="delS(s)">Xoá</button></td></tr></tbody></table>
+      <p class="mu">Ô hiển thị: số câu đúng/tổng số câu. “–” là chưa làm.</p></div>
+  </div>
+</template>
+
+<!-- HỌC SINH -->
+<template v-else>
+  <div v-if="!cur">
+    <div class="card"><b>Xin chào {{me.name}}!</b><div class="grid" style="align-items:center;margin-top:8px"><div class="row"><donut :v="prog(me)"></donut><span class="mu">Tiến độ chung<br>của em</span></div><div><div class="mu">Điểm bài tập từng bài (thang 10)</div><bar-chart :items="myChart" :max="10"></bar-chart></div></div></div>
+    <div class="grid"><div class="card" v-for="(l,i) in vis"><span class="tag">Bài {{i+1}}</span><h3 style="margin:8px 0">{{l.title}}</h3>
+      <div class="bar"><i :style="{width:lp(me,l)+'%'}"></i></div><div class="mu" style="margin:6px 0 10px">Hoàn thành {{lp(me,l)}}% · Bài tập: {{scoreTxt(me,l)}}</div>
+      <button class="p" @click="open(l)">Học bài</button></div></div>
+  </div>
+
+  <div v-else>
+    <button @click="cur=null" style="margin-bottom:12px">← Danh sách bài</button>
+    <div class="card"><h2 style="margin:0 0 10px">{{cur.title}}</h2>
+      <div class="nav" style="margin:0"><button v-for="t in [['th','📖 Lí thuyết'],['bt','✏️ Bài tập'],['tn','🧪 Thí nghiệm']]" :class="{on:tab===t[0]}" @click="tab=t[0]">{{t[1]}}</button></div></div>
+
+    <div class="card" v-if="tab==='th'"><div class="th" v-html="cur.theory"></div>
+      <div class="row" style="margin-top:14px"><label class="row" style="font-size:15px;color:var(--tx)"><input type="checkbox" style="width:auto;margin:0" :checked="pr(me,cur).read" @change="pr(me,cur).read=$event.target.checked;save()"> Em đã đọc xong bài này</label></div></div>
+
+    <div v-if="tab==='bt'">
+      <div class="card" v-for="(q,i) in cur.questions"><b>Câu {{i+1}}. {{q.q}}</b>
+        <button class="opt" v-for="(o,j) in q.opts" :key="j" :class="{on:!sub&&ans[i]===j,ok:sub&&j===q.a,no:sub&&ans[i]===j&&j!==q.a}" @click="!sub&&(ans[i]=j)">{{'ABCD'[j]}}. {{o}}</button></div>
+      <div class="card row" v-if="cur.questions.length"><button class="p" v-if="!sub" @click="submit">Nộp bài</button>
+        <template v-else><b>Kết quả: {{score}}/{{cur.questions.length}} câu đúng</b><button @click="redo">Làm lại</button></template></div>
+      <div class="card" v-else>Giáo viên chưa thêm bài tập.</div>
+    </div>
+
+    <div class="card" v-if="tab==='tn'"><h3 style="margin-top:0">{{cur.exp.name||'Chưa có thí nghiệm'}}</h3>
+      <div class="box"><b>Dụng cụ, hoá chất:</b> {{cur.exp.mats}}</div>
+      <div class="step" v-for="(s,i) in steps(cur)"><input type="checkbox" v-model="chk[i]"><span :style="{textDecoration:chk[i]?'line-through':'none'}"><b>Bước {{i+1}}.</b> {{s}}</span></div>
+      <div class="row" style="margin-top:12px"><button class="p" :disabled="!allChk" @click="showRes=true;pr(me,cur).exp=true;save()">Quan sát hiện tượng</button><span class="mu" v-if="!allChk">Hoàn thành tất cả các bước để xem kết quả.</span></div>
+      <div class="box" v-if="showRes||pr(me,cur).exp&&allChk"><b>Hiện tượng &amp; giải thích:</b><p>{{cur.exp.result}}</p></div>
+<div v-if="cur.exp.sim&&cur.exp.sim.length" style="margin-top:16px"><h4 style="color:var(--pr);margin:0 0 8px">🔬 Mô phỏng: chọn thí nghiệm để quan sát</h4><div class="row"><button v-for="(x,i) in cur.exp.sim" :key="i" :class="{on:sim===i}" @click="sim=i">{{x.n}}</button></div><div class="box row" v-if="sim>=0"><svg viewBox="0 0 120 120" width="120"><path d="M32 45 V95 Q32 103 40 103 H80 Q88 103 88 95 V45 Z" :fill="cur.exp.sim[sim].c"/><path d="M30 15 V95 Q30 105 40 105 H80 Q90 105 90 95 V15" fill="none" stroke="var(--tx)" stroke-width="3"/><g v-if="cur.exp.sim[sim].k==='gas'"><circle v-for="b in 6" :key="b" :cx="36+b*8" cy="90" r="3" fill="#fff" stroke="var(--mu)" stroke-width=".5"><animate attributeName="cy" values="95;50" :dur="(0.8+b*0.25)+'s'" repeatCount="indefinite"/></circle></g><g v-if="cur.exp.sim[sim].k==='ppt'"><circle v-for="b in 7" :key="b" :cx="34+b*7" cy="98" r="3.5" fill="var(--tx)" opacity=".55"/></g></svg><div style="flex:1;min-width:200px"><b>{{cur.exp.sim[sim].n}}</b><p style="margin:6px 0 0">{{cur.exp.sim[sim].r}}</p></div></div></div></div>
+  </div>
+</template>
+</main>
+</div>
+
+<script>
+const {createApp,reactive,toRefs,computed,watch}=Vue;
+const KEY='khtn8_v3';
+const flow=a=>'<div class="flow">'+a.map(x=>x[0]==='>'?'<span class="fa">'+x.slice(1)+'</span>':'<div class="fb">'+x+'</div>').join('')+'</div>';
+const SIM={
+1:[{n:'Fe + dd CuSO₄',c:'#9ec9e8',r:'Đinh sắt phủ lớp đồng màu đỏ, dung dịch nhạt dần màu xanh: có chất mới tạo thành.',k:'ppt'},{n:'Zn + dd HCl',c:'#e8f1f5',r:'Có bọt khí H₂ thoát ra, kẽm tan dần.',k:'gas'},{n:'Đun nóng nước đá',c:'#e8f1f5',r:'Chỉ đổi trạng thái, không tạo chất mới: đây là biến đổi vật lí.',k:''}],
+2:[{n:'BaCl₂ + Na₂SO₄',c:'#f1f1f1',r:'Kết tủa trắng BaSO₄; cân trước và sau phản ứng không đổi.',k:'ppt'},{n:'CaCO₃ + HCl (cốc hở)',c:'#e8f1f5',r:'CO₂ bay ra ngoài nên số chỉ cân giảm; trong bình kín thì khối lượng không đổi.',k:'gas'},{n:'Đốt Mg trong không khí',c:'#fff4c2',r:'Cháy sáng chói tạo MgO màu trắng; khối lượng tăng vì Mg kết hợp thêm O₂.',k:''}],
+3:[{n:'Baking soda + giấm',c:'#e8f1f5',r:'Khí CO₂ thoát ra làm phồng bóng bay (d CO₂/không khí ≈ 1,52).',k:'gas'},{n:'Zn + HCl',c:'#e8f1f5',r:'Sinh khí H₂ nhẹ hơn không khí (d = 2/29 ≈ 0,07).',k:'gas'}],
+4:[{n:'10 g muối + 90 g nước',c:'#e8f1f5',r:'Muối tan hết, thu dung dịch có C% = 10%.',k:''},{n:'Thêm muối đến bão hoà',c:'#e8f1f5',r:'Muối dư lắng dưới đáy: dung dịch đã bão hoà.',k:'ppt'},{n:'CuSO₄ tan trong nước',c:'#7ab8e8',r:'Dung dịch màu xanh lam, nồng độ càng lớn màu càng đậm.',k:''}],
+5:[{n:'Nước chanh (pH≈2)',c:'#e11d48',r:'Nước bắp cải chuyển đỏ: acid mạnh.',k:''},{n:'Giấm ăn (pH≈3)',c:'#ec4899',r:'Nước bắp cải ngả hồng: acid.',k:''},{n:'Nước cất (pH=7)',c:'#7c3aed',r:'Giữ màu tím: trung tính.',k:''},{n:'Xà phòng (pH≈10)',c:'#22c55e',r:'Chuyển xanh lục: base yếu.',k:''},{n:'NaOH loãng (pH≈13)',c:'#eab308',r:'Chuyển vàng: base mạnh.',k:''}]};
+const note=t=>'<div class="note"><b>Ghi nhớ:</b> '+t+'</div>';
+const DG={
+1:'<h4>Sơ đồ tóm tắt</h4>'+flow(['Chất phản ứng','>→ biến đổi →','Sản phẩm (chất mới)'])+flow(['Fe + CuSO₄','>→','FeSO₄ + Cu'])+note('Phản ứng hoá học tạo ra chất mới; biến đổi vật lí thì chất vẫn giữ nguyên.'),
+2:'<h4>Sơ đồ lập PTHH</h4>'+flow(['B1: Viết sơ đồ','>→','B2: Cân bằng nguyên tử','>→','B3: Viết PTHH'])+flow(['2H₂ + O₂','>→','2H₂O'])+note('Số nguyên tử mỗi nguyên tố ở hai vế phải bằng nhau.'),
+3:'<h4>Sơ đồ chuyển đổi</h4>'+flow(['m (g)','>⇄ ÷M / ×M ⇄','n (mol)','>⇄ ×24,79 / ÷24,79 ⇄','V (L)'])+note('d(A/B) = M(A) / M(B): cho biết khí A nặng hay nhẹ hơn khí B bao nhiêu lần.'),
+4:'<h4>Sơ đồ tóm tắt</h4>'+flow(['Chất tan','>+','Dung môi','>=','Dung dịch'])+flow(['m<sub>ct</sub>','>÷','m<sub>dd</sub>','>× 100% =','C%'])+note('m<sub>dd</sub> = m<sub>ct</sub> + m<sub>dung môi</sub>.'),
+5:'<h4>Thang pH</h4><div class="ph"></div><div class="pl"><span>0 – acid mạnh</span><span>7 – trung tính</span><span>14 – base mạnh</span></div>'+flow(['Acid','>+','Base','>→','Muối + H₂O'])+note('Quỳ tím: đỏ (acid), tím (trung tính), xanh (base).')};
+const EX={1:[['Khi nung đá vôi, các sản phẩm là',['CaCO₃','CaO và CO₂','Chỉ CaO','H₂O'],1]],
+2:[['Nung 10 g CaCO₃ thu 5,6 g CaO. Khối lượng CO₂ là',['4,4 g','5,6 g','10 g','15,6 g'],0]],
+3:[['Thể tích của 0,2 mol khí ở điều kiện chuẩn gần bằng',['4,96 L','2,48 L','12,4 L','24,79 L'],0]],
+4:[['Hoà tan 10 g đường vào 40 g nước. C% là',['10%','20%','25%','50%'],1]],
+5:[['Dung dịch nào có pH lớn hơn 7?',['Nước chanh','Giấm ăn','Nước xà phòng','Nước cất'],2]]};
+const L=(id,title,theory,qs,exp)=>({id,title,theory:theory+(DG[id]||''),questions:qs.concat(EX[id]||[]).map(q=>({q:q[0],opts:q[1],a:q[2]})),exp:{name:exp[0],mats:exp[1],steps:exp[2],result:exp[3],sim:SIM[id]||[]}});
+const seed=()=>({lessons:[
+L(1,'Phản ứng hoá học','<h4>Khái niệm</h4><p>Phản ứng hoá học là quá trình biến đổi chất này thành chất khác. Chất ban đầu gọi là <b>chất phản ứng</b>, chất mới tạo thành gọi là <b>sản phẩm</b>.</p><h4>Dấu hiệu nhận biết</h4><ul><li>Thay đổi màu sắc</li><li>Xuất hiện chất khí (sủi bọt) hoặc kết tủa</li><li>Toả nhiệt, phát sáng</li></ul><h4>Điều kiện xảy ra</h4><p>Các chất tiếp xúc với nhau; có thể cần đun nóng, xúc tác, chất ở dạng bột mịn hoặc dung dịch.</p>',
+ [['Quá trình nào là phản ứng hoá học?',['Nước đá tan chảy','Đốt cháy cồn','Hoà tan muối vào nước','Cô cạn nước muối'],1],['Dấu hiệu nào cho biết có phản ứng hoá học xảy ra?',['Chất đổi trạng thái','Chất tan trong nước','Xuất hiện chất mới','Chất đổi hình dạng'],2]],
+ ['Sắt tác dụng với dung dịch đồng(II) sunfat','Đinh sắt sạch, dd CuSO₄, cốc thuỷ tinh','Cho dd CuSO₄ vào cốc\nThả đinh sắt vào dung dịch\nĐể yên 5 phút rồi quan sát','Đinh sắt phủ lớp chất rắn màu đỏ, màu xanh của dung dịch nhạt dần: Fe + CuSO₄ → FeSO₄ + Cu.']),
+L(2,'Định luật bảo toàn khối lượng và PTHH','<h4>Định luật</h4><p>Trong một phản ứng hoá học, <b>tổng khối lượng các chất sản phẩm bằng tổng khối lượng các chất phản ứng</b>.</p><h4>Lập phương trình hoá học</h4><ul><li>B1: Viết sơ đồ phản ứng</li><li>B2: Cân bằng số nguyên tử mỗi nguyên tố hai vế</li><li>B3: Viết PTHH hoàn chỉnh</li></ul><p>Ví dụ: 2H₂ + O₂ → 2H₂O</p>',
+ [['Hệ số cân bằng của H₂O trong: H₂ + O₂ → H₂O là',['1','2','3','4'],1],['Đốt 2,4 g Mg thu được 4 g MgO. Khối lượng O₂ đã phản ứng là',['1,6 g','2,4 g','4 g','6,4 g'],0]],
+ ['Kiểm chứng bảo toàn khối lượng','Cân, 2 ống nghiệm, dd BaCl₂, dd Na₂SO₄','Cho hai dung dịch vào hai ống riêng\nCân khối lượng cả hai ống\nĐổ ống này vào ống kia, cân lại','Xuất hiện kết tủa trắng BaSO₄, số chỉ cân không đổi: khối lượng được bảo toàn.']),
+L(3,'Mol và tỉ khối của chất khí','<h4>Mol</h4><p>1 mol chứa 6,022·10²³ hạt. Khối lượng mol M (g/mol) có số trị bằng khối lượng nguyên tử/phân tử.</p><h4>Công thức</h4><ul><li>n = m / M</li><li>V = n × 24,79 (L, ở điều kiện chuẩn)</li><li>d<sub>A/B</sub> = M<sub>A</sub> / M<sub>B</sub></li></ul>',
+ [['Khối lượng của 0,5 mol H₂O (M = 18) là',['9 g','18 g','36 g','4,5 g'],0],['Tỉ khối của CO₂ so với H₂ là',['22','44','11','2'],0]],
+ ['Khí CO₂ thổi phồng bóng bay','Chai nhựa, giấm ăn, baking soda, bóng bay','Cho baking soda vào bóng bay\nRót giấm vào chai\nChụp bóng lên miệng chai, dốc baking soda xuống','Có sủi bọt, bóng phồng lên vì sinh ra khí CO₂ nặng hơn không khí (d ≈ 1,52).']),
+L(4,'Dung dịch và nồng độ dung dịch','<h4>Dung dịch</h4><p>Hỗn hợp đồng nhất của chất tan và dung môi.</p><h4>Nồng độ</h4><ul><li>C% = m<sub>ct</sub> / m<sub>dd</sub> × 100%</li><li>C<sub>M</sub> = n / V (mol/L)</li></ul><p>Độ tan là số gam chất tan trong 100 g nước tạo dung dịch bão hoà ở nhiệt độ xác định.</p>',
+ [['Hoà tan 20 g muối vào 80 g nước. C% của dung dịch là',['20%','25%','80%','16%'],0],['0,2 mol NaCl trong 0,5 L dung dịch có nồng độ',['0,1 M','0,4 M','0,2 M','1 M'],1]],
+ ['Pha dung dịch muối ăn','Muối ăn, nước, cân, cốc, đũa khuấy','Cân 10 g muối\nĐong 90 g nước vào cốc\nĐổ muối vào, khuấy đến tan hết','Muối tan hoàn toàn tạo dung dịch trong suốt có C% = 10%.']),
+L(5,'Acid – Base – Thang pH','<h4>Tính chất</h4><ul><li>Acid: vị chua, làm quỳ tím hoá đỏ (pH &lt; 7)</li><li>Base (kiềm): làm quỳ tím hoá xanh (pH &gt; 7)</li><li>Trung tính: pH = 7</li></ul><h4>Trung hoà</h4><p>Acid + Base → Muối + Nước.</p>',
+ [['Dung dịch có pH = 3 là',['Acid','Base','Trung tính','Muối'],0],['Dung dịch NaOH làm quỳ tím chuyển',['Đỏ','Xanh','Không đổi','Vàng'],1]],
+ ['Chất chỉ thị từ bắp cải tím','Nước ép bắp cải tím, giấm, nước chanh, dd xà phòng','Cho nước bắp cải vào 3 cốc\nNhỏ giấm, nước chanh, xà phòng vào từng cốc\nQuan sát màu','Giấm và chanh làm dung dịch ngả hồng/đỏ (acid), xà phòng ngả xanh lục (base).'])],
+students:[{id:1,name:'Nguyễn Minh An',p:{}},{id:2,name:'Trần Bảo Châu',p:{}},{id:3,name:'Lê Gia Huy',p:{}}]});
+let init;try{init=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!init||!init.lessons)init=seed();
+
+const BarChart={props:{items:Array,max:{type:Number,default:10}},
+template:`<svg :viewBox="'0 0 '+w+' 190'" width="100%" role="img"><g v-for="g in [0,.5,1]"><line x1="30" :x2="w" :y1="150-g*120" :y2="150-g*120" stroke="var(--bd)"/><text x="26" :y="154-g*120" text-anchor="end" font-size="10" fill="var(--mu)">{{+(g*max).toFixed(0)}}</text></g><g v-for="(it,i) in items" :key="i"><rect :x="40+i*bw" :y="150-h(it)" :width="bw-14" :height="h(it)" rx="4" fill="var(--pr)"/><text :x="40+i*bw+(bw-14)/2" :y="144-h(it)" text-anchor="middle" font-size="11" fill="var(--tx)">{{it.value===null?'–':it.value}}</text><text :x="40+i*bw+(bw-14)/2" y="168" text-anchor="middle" font-size="10" fill="var(--mu)">{{it.label}}</text></g></svg>`,
+computed:{bw(){return Math.max(54,Math.min(90,600/Math.max(this.items.length,1)))},w(){return 50+this.items.length*this.bw}},
+methods:{h(it){return it.value?Math.min(it.value,this.max)/this.max*120:0}}};
+const Donut={props:{v:Number},template:`<svg viewBox="0 0 100 100" width="110"><circle cx="50" cy="50" r="40" fill="none" stroke="var(--soft)" stroke-width="12"/><circle cx="50" cy="50" r="40" fill="none" stroke="var(--pr)" stroke-width="12" stroke-linecap="round" :stroke-dasharray="v*2.513+' 251.3'" transform="rotate(-90 50 50)"/><text x="50" y="56" text-anchor="middle" font-size="20" font-weight="700" fill="var(--tx)">{{v}}%</text></svg>`};
+createApp({setup(){
+  const db=reactive(init);
+  const s=reactive({role:null,me:null,pw:'',err:'',pick:'',newName:'',tv:'home',edit:null,isNew:false,cur:null,tab:'th',ans:{},sub:false,chk:{},showRes:false,sim:-1,detail:null});
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){}};
+  const clone=l=>{const c=JSON.parse(JSON.stringify(l));c.exp.steps=String(c.exp.steps);s.isNew=false;return c};
+  const pr=(st,l)=>{if(!st.p[l.id])st.p[l.id]={read:false,score:null,total:0,exp:false};return st.p[l.id]};
+  const lp=(st,l)=>{const p=st.p[l.id]||{};return Math.round(((p.read?1:0)+(p.score!==null&&p.score!==undefined?1:0)+(p.exp?1:0))/3*100)};
+  const prog=st=>db.lessons.length?Math.round(db.lessons.reduce((a,l)=>a+lp(st,l),0)/db.lessons.length):0;
+  const scoreTxt=(st,l)=>{const p=st.p[l.id];return p&&p.score!==null&&p.score!==undefined?p.score+'/'+p.total:'–'};
+  const sc10=(p)=>p&&p.score!==null&&p.score!==undefined&&p.total?p.score/p.total*10:null;
+  const doneCount=l=>db.students.filter(x=>sc10(x.p[l.id])!==null).length;
+  const avg=a=>a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1):'–';
+  const avgLesson=l=>avg(db.students.map(x=>sc10(x.p[l.id])).filter(v=>v!==null));
+  const avgAll=computed(()=>avg(db.students.flatMap(x=>db.lessons.map(l=>sc10(x.p[l.id]))).filter(v=>v!==null)));
+  const progAll=computed(()=>db.students.length?Math.round(db.students.reduce((a,x)=>a+prog(x),0)/db.students.length):0);
+  const score=computed(()=>s.cur?s.cur.questions.filter((q,i)=>s.ans[i]===q.a).length:0);
+  const steps=l=>String(l.exp.steps||'').split('\n').filter(x=>x.trim());
+  const allChk=computed(()=>s.cur&&steps(s.cur).length>0&&steps(s.cur).every((_,i)=>s.chk[i]));
+  const chartL=computed(()=>db.lessons.map((l,i)=>{const a=avgLesson(l);return{label:'Bài '+(i+1),value:a==='–'?null:+a}}));
+  const chartS=computed(()=>db.students.map(x=>({label:x.name.split(' ').pop(),value:prog(x)})));
+  const myChart=computed(()=>s.me?db.lessons.map((l,i)=>{const v=sc10(s.me.p[l.id]);return{label:'Bài '+(i+1),value:v===null?null:+v.toFixed(1)}}):[]);
+  const dchart=computed(()=>s.detail?db.lessons.map((l,i)=>{const v=sc10(s.detail.p[l.id]);return{label:'Bài '+(i+1),value:v===null?null:+v.toFixed(1)}}):[]);
+  const vis=computed(()=>db.lessons.filter(l=>!l.hidden));
+  const loginT=()=>{if(s.pw==='gv123'){s.role='teacher';s.err='';s.pw=''}else s.err='Sai mật khẩu.'};
+  const loginS=id=>{s.me=db.students.find(x=>x.id==id);s.role='student';s.cur=null};
+  const regS=()=>{const n=s.newName.trim();if(!n)return;const st={id:Date.now(),name:n,p:{}};db.students.push(st);save();s.newName='';loginS(st.id)};
+  const addS=()=>{const n=s.newName.trim();if(!n)return;db.students.push({id:Date.now(),name:n,p:{}});s.newName='';save()};
+  const delS=st=>{if(confirm('Xoá '+st.name+'?')){db.students.splice(db.students.indexOf(st),1);save()}};
+  const logout=()=>{s.role=null;s.me=null;s.cur=null;s.edit=null;s.tv='home'};
+  const newLesson=()=>{s.isNew=true;s.edit={id:Date.now(),title:'',theory:'',questions:[],exp:{name:'',mats:'',steps:'',result:''}}};
+  const saveLesson=()=>{const e=s.edit;if(!e.title.trim())return alert('Nhập tiêu đề bài học.');e.questions=e.questions.filter(q=>q.q.trim());const i=db.lessons.findIndex(l=>l.id===e.id);if(i<0)db.lessons.push(e);else db.lessons[i]=e;save();s.edit=null};
+  const delLesson=l=>{if(confirm('Xoá bài "'+l.title+'"?')){db.lessons.splice(db.lessons.indexOf(l),1);save()}};
+  const open=l=>{s.cur=l;s.tab='th';s.ans={};s.sub=false;s.showRes=false;s.sim=-1;s.chk={}};
+  const submit=()=>{const p=pr(s.me,s.cur);p.score=score.value;p.total=s.cur.questions.length;s.sub=true;save()};
+  const redo=()=>{s.ans={};s.sub=false};
+  return{db,...toRefs(s),chartL,chartS,myChart,dchart,vis,save,clone,pr,lp,prog,scoreTxt,doneCount,avgLesson,avgAll,progAll,score,steps,allChk,loginT,loginS,regS,addS,delS,logout,newLesson,saveLesson,delLesson,open,submit,redo}
+}}).component('bar-chart',BarChart).component('donut',Donut).mount('#app');
+</script>
+</body>
+</html>
